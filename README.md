@@ -47,6 +47,8 @@ This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public e
 - `name`
   Required. Tableau workbook and dashboard name in this format:
   `WORKBOOK_NAME/DASHBOARD_NAME`
+  HTML-encoded or URL-encoded slashes are supported, for example
+  `WORKBOOK_NAME&#47;DASHBOARD_NAME` and `WORKBOOK_NAME%2FDASHBOARD_NAME`.
 - `public_url`
   Optional. Full Tableau Public URL for the iframe and fallback link. Must use `https://public.tableau.com/views/`.
 - `height`

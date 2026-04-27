@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tableau Embed Shortcode
  * Description: Provides an accessible Tableau embed shortcode for reusable dashboard embeds.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Lobsang Wangdu
  * Author URI: https://ucnature.org/
  * License: GPLv2 or later
@@ -23,6 +23,20 @@ if ( ! function_exists( 'tableau_embed_shortcode_sanitize_name' ) ) {
 	 * @return string
 	 */
 	function tableau_embed_shortcode_sanitize_name( $name ) {
+		$charset = get_bloginfo( 'charset' );
+		$charset = '' !== $charset ? $charset : 'UTF-8';
+		$name    = html_entity_decode( wp_unslash( (string) $name ), ENT_QUOTES, $charset );
+		$name    = rawurldecode( $name );
+		$parsed  = wp_parse_url( $name );
+
+		if ( is_array( $parsed ) && isset( $parsed['host'], $parsed['path'] ) ) {
+			$host = strtolower( $parsed['host'] );
+
+			if ( 'public.tableau.com' === $host && 0 === strpos( $parsed['path'], '/views/' ) ) {
+				$name = substr( $parsed['path'], strlen( '/views/' ) );
+			}
+		}
+
 		$name = sanitize_text_field( $name );
 		$name = preg_split( '/[?#]/', $name );
 		$name = is_array( $name ) ? reset( $name ) : '';
@@ -300,7 +314,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Tableau Embed Shortcode Examples', 'tableau-embed-shortcode' ); ?></h1>
-			<p><?php esc_html_e( 'Plugin version: 1.0.1', 'tableau-embed-shortcode' ); ?></p>
+			<p><?php esc_html_e( 'Plugin version: 1.0.2', 'tableau-embed-shortcode' ); ?></p>
 			<p><?php esc_html_e( 'Copy one of the shortcode examples below into a page, post, or shortcode-enabled block.', 'tableau-embed-shortcode' ); ?></p>
 
 			<h2><?php esc_html_e( 'Examples', 'tableau-embed-shortcode' ); ?></h2>
