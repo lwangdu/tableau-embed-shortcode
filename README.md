@@ -62,7 +62,7 @@ This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public e
   Optional. Short text shown under the title.
 - `show_link`
   Optional. Set to `false` to hide the visible Tableau Public fallback link.
-  Default is `true`.
+  Default is `true`. The fallback link appears below the embedded map or chart.
 - `hide_title`
   Optional. Set to `true` to visually hide the title while keeping it available to screen readers.
   When the title is hidden, the fallback link uses generic visible text and keeps the chart title in an accessible label.

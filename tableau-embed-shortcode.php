@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tableau Embed Shortcode
  * Description: Provides an accessible Tableau embed shortcode for reusable dashboard embeds.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Lobsang Wangdu
  * Author URI: https://ucnature.org/
  * License: GPLv2 or later
@@ -246,14 +246,6 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 				<p id="<?php echo esc_attr( $summary_id ); ?>"><?php echo esc_html( $summary ); ?></p>
 			<?php endif; ?>
 
-			<?php if ( $show_link ) : ?>
-				<p id="<?php echo esc_attr( $fallback_id ); ?>">
-					<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $fallback_label ); ?>">
-						<?php echo esc_html( $fallback_text ); ?>
-					</a>
-				</p>
-			<?php endif; ?>
-
 			<div
 				class="tableau-placeholder"
 				id="<?php echo esc_attr( $viz_id ); ?>"
@@ -286,6 +278,14 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 					<?php endif; ?>
 				></iframe>
 			</div>
+
+			<?php if ( $show_link ) : ?>
+				<p id="<?php echo esc_attr( $fallback_id ); ?>">
+					<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $fallback_label ); ?>">
+						<?php echo esc_html( $fallback_text ); ?>
+					</a>
+				</p>
+			<?php endif; ?>
 		</section>
 		<?php
 
@@ -312,7 +312,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Tableau Embed Shortcode Examples', 'tableau-embed-shortcode' ); ?></h1>
-			<p><?php esc_html_e( 'Plugin version: 1.0.3', 'tableau-embed-shortcode' ); ?></p>
+			<p><?php esc_html_e( 'Plugin version: 1.0.4', 'tableau-embed-shortcode' ); ?></p>
 			<p><?php esc_html_e( 'Copy one of the shortcode examples below into a page, post, or shortcode-enabled block.', 'tableau-embed-shortcode' ); ?></p>
 
 			<h2><?php esc_html_e( 'Examples', 'tableau-embed-shortcode' ); ?></h2>
