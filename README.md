@@ -65,6 +65,7 @@ This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public e
   Default is `true`.
 - `hide_title`
   Optional. Set to `true` to visually hide the title while keeping it available to screen readers.
+  When the title is hidden, the fallback link uses generic visible text and keeps the chart title in an accessible label.
 
 ## Reusable pattern
 

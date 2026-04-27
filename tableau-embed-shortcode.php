@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tableau Embed Shortcode
  * Description: Provides an accessible Tableau embed shortcode for reusable dashboard embeds.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Lobsang Wangdu
  * Author URI: https://ucnature.org/
  * License: GPLv2 or later
@@ -165,6 +165,19 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 			__( '%s interactive Tableau visualization', 'tableau-embed-shortcode' ),
 			$title
 		);
+		$fallback_label   = sprintf(
+			/* translators: %s: Tableau visualization title. */
+			__( 'Open %s on Tableau Public', 'tableau-embed-shortcode' ),
+			$title
+		);
+		$fallback_text    = $hide_title ? __( 'Open this chart on Tableau Public', 'tableau-embed-shortcode' ) : $fallback_label;
+		$noscript_label   = sprintf(
+			/* translators: %s: Tableau visualization title. */
+			__( 'View %s on Tableau Public', 'tableau-embed-shortcode' ),
+			$title
+		);
+		$noscript_text    = $hide_title ? __( 'View this chart on Tableau Public', 'tableau-embed-shortcode' ) : $noscript_label;
+		$title_class      = $hide_title ? 'screen-reader-text tableau-screen-reader-text' : '';
 		$height_style     = sprintf(
 			'--tableau-desktop-height: %1$dpx; --tableau-mobile-height: %2$dpx;',
 			$height,
@@ -181,6 +194,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 					margin: 1.5rem 0;
 				}
 
+				.screen-reader-text.tableau-screen-reader-text,
 				.tableau-screen-reader-text {
 					border: 0;
 					clip: rect(1px, 1px, 1px, 1px);
@@ -224,7 +238,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 		}
 		?>
 		<section class="tableau-chart" aria-labelledby="<?php echo esc_attr( $title_id ); ?>">
-			<<?php echo tag_escape( $heading_tag ); ?> id="<?php echo esc_attr( $title_id ); ?>"<?php if ( $hide_title ) : ?> class="tableau-screen-reader-text"<?php endif; ?>>
+			<<?php echo tag_escape( $heading_tag ); ?> id="<?php echo esc_attr( $title_id ); ?>"<?php if ( '' !== $title_class ) : ?> class="<?php echo esc_attr( $title_class ); ?>"<?php endif; ?>>
 				<?php echo esc_html( $title ); ?>
 			</<?php echo tag_escape( $heading_tag ); ?>>
 
@@ -234,16 +248,8 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 
 			<?php if ( $show_link ) : ?>
 				<p id="<?php echo esc_attr( $fallback_id ); ?>">
-					<a href="<?php echo esc_url( $public_url ); ?>">
-						<?php
-						echo esc_html(
-							sprintf(
-								/* translators: %s: Tableau visualization title. */
-								__( 'Open %s on Tableau Public', 'tableau-embed-shortcode' ),
-								$title
-							)
-						);
-						?>
+					<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $fallback_label ); ?>">
+						<?php echo esc_html( $fallback_text ); ?>
 					</a>
 				</p>
 			<?php endif; ?>
@@ -260,16 +266,8 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 			>
 				<noscript>
 					<p>
-						<a href="<?php echo esc_url( $public_url ); ?>">
-							<?php
-							echo esc_html(
-								sprintf(
-									/* translators: %s: Tableau visualization title. */
-									__( 'View %s on Tableau Public', 'tableau-embed-shortcode' ),
-									$title
-								)
-							);
-							?>
+						<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $noscript_label ); ?>">
+							<?php echo esc_html( $noscript_text ); ?>
 						</a>
 					</p>
 				</noscript>
@@ -314,7 +312,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Tableau Embed Shortcode Examples', 'tableau-embed-shortcode' ); ?></h1>
-			<p><?php esc_html_e( 'Plugin version: 1.0.2', 'tableau-embed-shortcode' ); ?></p>
+			<p><?php esc_html_e( 'Plugin version: 1.0.3', 'tableau-embed-shortcode' ); ?></p>
 			<p><?php esc_html_e( 'Copy one of the shortcode examples below into a page, post, or shortcode-enabled block.', 'tableau-embed-shortcode' ); ?></p>
 
 			<h2><?php esc_html_e( 'Examples', 'tableau-embed-shortcode' ); ?></h2>
