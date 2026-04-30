@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="Tableau Embed Shortcode">
+	<description>PHPCS configuration for Tableau Embed Shortcode (WordPress Coding Standards).</description>
+
+	<file>tableau-embed-shortcode.php</file>
+
+	<!-- Composer vendor dir when using local PHPCS/WPCS -->
+	<exclude-pattern>vendor/*</exclude-pattern>
+
+	<!--
+		Target runtime: match plugin header and readme.
+		Adjust testVersion when minimum PHP is raised.
+	-->
+	<config name="minimum_supported_wp_version" value="6.0"/>
+
+	<!--
+		Use installed standard: WordPress-Core + WordPress-Docs +
+		contributed extra sniffs (`WordPress` ruleset ships with `wpcs`).
+	-->
+	<rule ref="WordPress"/>
+</ruleset>
