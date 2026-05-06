@@ -40,6 +40,12 @@ This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public e
 [tableau_embed title="Reserve Visits" name="YOURWORKBOOK/YOURDASHBOARD" height="600" mobile_height="420" summary="Interactive Tableau chart showing reserve visits."]
 ```
 
+## Example with responsive width and tablet height
+
+```text
+[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" tablet_height="640" mobile_height="500" max_width="1100"]
+```
+
 ## Attributes
 
 - `title`
@@ -51,8 +57,12 @@ This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public e
   `WORKBOOK_NAME&#47;DASHBOARD_NAME` and `WORKBOOK_NAME%2FDASHBOARD_NAME`.
 - `public_url`
   Optional. Full Tableau Public URL for the iframe and fallback link. Must use `https://public.tableau.com/views/`.
+- `max_width`
+  Optional. Maximum frontend width in pixels. Useful when you want multiple embeds to appear the same width.
 - `height`
   Optional. Desktop height in pixels. Default is `827`.
+- `tablet_height`
+  Optional. Tablet height in pixels for medium screens. Default is `640`.
 - `mobile_height`
   Optional. Mobile height in pixels. Default is `727`.
 - `heading`
@@ -76,7 +86,9 @@ For each new Tableau page, change only:
 - `title`
 - `name`
 - `public_url` if needed
+- `max_width` if you want charts on different pages to appear the same width
 - `height`
+- `tablet_height`
 - `mobile_height`
 - `loading` (e.g. `eager` for a primary chart at the top of the page)
 
@@ -100,6 +112,12 @@ For each new Tableau page, change only:
 [tableau_embed title="Reserve Visits" name="YOURWORKBOOK/ReserveVisits" height="600" mobile_height="420"]
 ```
 
+### Responsive map with consistent width
+
+```text
+[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" tablet_height="640" mobile_height="500" max_width="1100"]
+```
+
 ## Hero or above-the-fold chart
 
 Use **`loading="eager"`** so the iframe is not deferred by the browser’s lazy-loading behavior (default is `lazy`).
@@ -113,6 +131,7 @@ Use **`loading="eager"`** so the iframe is not deferred by the browser’s lazy-
 - Always use a clear `title`.
 - Add `summary` for important charts when possible.
 - Prefer `loading="eager"` for prominent charts at the top of the page so visualization is not unnecessarily delayed.
+- Use `tablet_height`, `mobile_height`, and `max_width` to improve consistency across phones, tablets, and desktop.
 - Keep the visible Tableau Public fallback link unless there is a strong reason to hide it.
 - Use a real Tableau Public embed link in `public_url` if you want an exact iframe and fallback URL.
 - For the most important visualizations, also provide a short text summary or data table on the page.

@@ -234,7 +234,9 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 				'title'         => '',
 				'name'          => '',
 				'public_url'    => '',
+				'max_width'     => '',
 				'height'        => '827',
+				'tablet_height' => '640',
 				'mobile_height' => '727',
 				'heading'       => 'h2',
 				'summary'       => '',
@@ -271,7 +273,9 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 		$heading        = strtolower( $atts['heading'] );
 		$heading_tag    = in_array( $heading, $heading_levels, true ) ? $heading : 'h2';
 		$height         = max( 200, absint( $atts['height'] ) );
+		$tablet_height  = max( 200, absint( $atts['tablet_height'] ) );
 		$mobile_height  = max( 200, absint( $atts['mobile_height'] ) );
+		$max_width      = absint( $atts['max_width'] );
 		$show_link      = filter_var( $atts['show_link'], FILTER_VALIDATE_BOOLEAN );
 		$hide_title     = filter_var( $atts['hide_title'], FILTER_VALIDATE_BOOLEAN );
 		$loading_attr   = strtolower( sanitize_text_field( $atts['loading'] ) );
@@ -313,10 +317,16 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 		$noscript_text = $hide_title ? __( 'View this chart on Tableau Public', 'tableau-embed-shortcode' ) : $noscript_label;
 		$title_class   = $hide_title ? 'screen-reader-text tableau-screen-reader-text' : '';
 		$height_style  = sprintf(
-			'--tableau-desktop-height: %1$dpx; --tableau-mobile-height: %2$dpx;',
+			'--tableau-desktop-height: %1$dpx; --tableau-tablet-height: %2$dpx; --tableau-mobile-height: %3$dpx;',
 			$height,
+			$tablet_height,
 			$mobile_height
 		);
+		$wrapper_style = $height_style;
+
+		if ( $max_width > 0 ) {
+			$wrapper_style .= ' max-width: ' . $max_width . 'px; margin-left: auto; margin-right: auto;';
+		}
 
 		ob_start();
 
@@ -344,6 +354,8 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 				}
 
 				.tableau-placeholder {
+					margin-left: auto;
+					margin-right: auto;
 					max-width: 100%;
 					min-height: var(--tableau-mobile-height, 727px);
 					position: relative;
@@ -356,6 +368,16 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 					height: var(--tableau-mobile-height, 727px);
 					max-width: 100%;
 					width: 100%;
+				}
+
+				@media (min-width: 600px) {
+					.tableau-placeholder {
+						min-height: var(--tableau-tablet-height, 640px);
+					}
+
+					.tableau-embed-frame {
+						height: var(--tableau-tablet-height, 640px);
+					}
 				}
 
 				@media (min-width: 783px) {
@@ -387,7 +409,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 			<div
 				class="tableau-placeholder"
 				id="<?php echo esc_attr( $viz_id ); ?>"
-				style="<?php echo esc_attr( $height_style ); ?>"
+				style="<?php echo esc_attr( $wrapper_style ); ?>"
 				role="region"
 				aria-labelledby="<?php echo esc_attr( $title_id ); ?>"
 				<?php if ( ! empty( $describedby_attr ) ) : ?>
@@ -523,6 +545,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" hide_title="true" height="827" mobile_height="727"]',
 			'[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" mobile_height="727"]',
 			'[tableau_embed title="Reserve Visits" name="YOURWORKBOOK/YOURDASHBOARD" height="600" mobile_height="420" summary="Interactive Tableau chart showing reserve visits."]',
+			'[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" tablet_height="640" mobile_height="500" max_width="1100"]',
 		);
 		?>
 		<div class="wrap">
@@ -566,7 +589,9 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 				<li><code>title</code> <?php esc_html_e( 'Required. Visible chart title and accessible label.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>name</code> <?php esc_html_e( 'Required. Tableau workbook/dashboard name in the format WORKBOOK_NAME/DASHBOARD_NAME.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>public_url</code> <?php esc_html_e( 'Optional. Exact Tableau Public iframe and fallback URL.', 'tableau-embed-shortcode' ); ?></li>
+				<li><code>max_width</code> <?php esc_html_e( 'Optional. Maximum frontend width in pixels. Useful when you want multiple embeds to appear the same width.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>height</code> <?php esc_html_e( 'Optional. Desktop height in pixels. Default: 827.', 'tableau-embed-shortcode' ); ?></li>
+				<li><code>tablet_height</code> <?php esc_html_e( 'Optional. Tablet height in pixels for medium screens. Default: 640.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>mobile_height</code> <?php esc_html_e( 'Optional. Mobile height in pixels. Default: 727.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>heading</code> <?php esc_html_e( 'Optional. Allowed values: h2, h3, h4. Default: h2.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>summary</code> <?php esc_html_e( 'Optional. Short explanatory text shown under the title.', 'tableau-embed-shortcode' ); ?></li>
