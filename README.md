@@ -4,10 +4,29 @@ Author: Lobsang Wangdu
 
 This plugin provides a reusable `[tableau_embed]` shortcode for Tableau Public embeds.
 
+## Global defaults
+
+In WordPress admin, go to **Settings -> Tableau Embed** to set global defaults for:
+
+- desktop height
+- tablet height
+- mobile height
+- maximum width
+- default loading behavior
+- fallback link visibility
+
+After setting those once, your shortcode can be much shorter.
+
 ## Basic shortcode
 
 ```text
 [tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" height="827" mobile_height="727"]
+```
+
+## Short shortcode using global defaults
+
+```text
+[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard"]
 ```
 
 ## Shortcode with summary text

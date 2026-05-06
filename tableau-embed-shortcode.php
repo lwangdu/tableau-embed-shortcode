@@ -119,6 +119,29 @@ if ( ! function_exists( 'tableau_embed_shortcode_build_public_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tableau_embed_shortcode_get_default_options' ) ) {
+	/**
+	 * Gets plugin default display options.
+	 *
+	 * @return array<string, string>
+	 */
+	function tableau_embed_shortcode_get_default_options() {
+		$defaults = array(
+			'max_width'     => '',
+			'height'        => '827',
+			'tablet_height' => '640',
+			'mobile_height' => '727',
+			'show_link'     => 'true',
+			'loading'       => 'lazy',
+		);
+
+		$saved = get_option( 'tableau_embed_shortcode_defaults', array() );
+		$saved = is_array( $saved ) ? $saved : array();
+
+		return wp_parse_args( $saved, $defaults );
+	}
+}
+
 if ( ! function_exists( 'tableau_embed_shortcode_get_allowed_names' ) ) {
 	/**
 	 * Gets allowed Tableau names from plugin settings and filter.
@@ -229,20 +252,22 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 		static $instance       = 0;
 		static $styles_printed = false;
 
+		$default_options = tableau_embed_shortcode_get_default_options();
+
 		$atts = shortcode_atts(
 			array(
 				'title'         => '',
 				'name'          => '',
 				'public_url'    => '',
-				'max_width'     => '',
-				'height'        => '827',
-				'tablet_height' => '640',
-				'mobile_height' => '727',
+				'max_width'     => $default_options['max_width'],
+				'height'        => $default_options['height'],
+				'tablet_height' => $default_options['tablet_height'],
+				'mobile_height' => $default_options['mobile_height'],
 				'heading'       => 'h2',
 				'summary'       => '',
-				'show_link'     => 'true',
+				'show_link'     => $default_options['show_link'],
 				'hide_title'    => 'false',
-				'loading'       => 'lazy',
+				'loading'       => $default_options['loading'],
 			),
 			$atts,
 			'tableau_embed'
@@ -484,6 +509,28 @@ if ( ! function_exists( 'tableau_embed_shortcode_sanitize_allowed_names_option' 
 	}
 }
 
+if ( ! function_exists( 'tableau_embed_shortcode_sanitize_defaults_option' ) ) {
+	/**
+	 * Sanitizes global default settings.
+	 *
+	 * @param mixed $input Raw option input.
+	 * @return array<string, string>
+	 */
+	function tableau_embed_shortcode_sanitize_defaults_option( $input ) {
+		$defaults = tableau_embed_shortcode_get_default_options();
+		$input    = is_array( $input ) ? $input : array();
+
+		$defaults['max_width']     = isset( $input['max_width'] ) ? (string) absint( $input['max_width'] ) : '';
+		$defaults['height']        = (string) max( 200, absint( $input['height'] ?? $defaults['height'] ) );
+		$defaults['tablet_height'] = (string) max( 200, absint( $input['tablet_height'] ?? $defaults['tablet_height'] ) );
+		$defaults['mobile_height'] = (string) max( 200, absint( $input['mobile_height'] ?? $defaults['mobile_height'] ) );
+		$defaults['show_link']     = filter_var( $input['show_link'] ?? $defaults['show_link'], FILTER_VALIDATE_BOOLEAN ) ? 'true' : 'false';
+		$defaults['loading']       = 'eager' === strtolower( sanitize_text_field( $input['loading'] ?? $defaults['loading'] ) ) ? 'eager' : 'lazy';
+
+		return $defaults;
+	}
+}
+
 if ( ! function_exists( 'tableau_embed_shortcode_register_settings' ) ) {
 	/**
 	 * Registers plugin settings.
@@ -498,6 +545,16 @@ if ( ! function_exists( 'tableau_embed_shortcode_register_settings' ) ) {
 				'type'              => 'string',
 				'sanitize_callback' => 'tableau_embed_shortcode_sanitize_allowed_names_option',
 				'default'           => '',
+			)
+		);
+
+		register_setting(
+			'tableau_embed_shortcode',
+			'tableau_embed_shortcode_defaults',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => 'tableau_embed_shortcode_sanitize_defaults_option',
+				'default'           => tableau_embed_shortcode_get_default_options(),
 			)
 		);
 	}
@@ -540,13 +597,14 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 	 */
 	function tableau_embed_shortcode_examples_page() {
 		$examples = array(
-			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" height="827" mobile_height="727"]',
+			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard"]',
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" height="827" mobile_height="727" summary="Interactive Tableau dashboard showing user numbers."]',
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" hide_title="true" height="827" mobile_height="727"]',
 			'[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" mobile_height="727"]',
 			'[tableau_embed title="Reserve Visits" name="YOURWORKBOOK/YOURDASHBOARD" height="600" mobile_height="420" summary="Interactive Tableau chart showing reserve visits."]',
 			'[tableau_embed title="Reserve Map" name="YOURWORKBOOK/YOURDASHBOARD" height="827" tablet_height="640" mobile_height="500" max_width="1100"]',
 		);
+		$default_options = tableau_embed_shortcode_get_default_options();
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Tableau Embed Shortcode Examples', 'tableau-embed-shortcode' ); ?></h1>
@@ -577,6 +635,44 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 				><?php echo esc_textarea( (string) $allowed_names_value ); ?></textarea>
 				<p class="description"><?php esc_html_e( 'Example: 1_Reserveusers/Usernumbersdashboard', 'tableau-embed-shortcode' ); ?></p>
 				<?php submit_button( __( 'Save Allowed Views', 'tableau-embed-shortcode' ) ); ?>
+			</form>
+
+			<h2><?php esc_html_e( 'Global Defaults', 'tableau-embed-shortcode' ); ?></h2>
+			<p><?php esc_html_e( 'Set the common display values you want the shortcode to use automatically when attributes are omitted.', 'tableau-embed-shortcode' ); ?></p>
+			<form action="options.php" method="post">
+				<?php settings_fields( 'tableau_embed_shortcode' ); ?>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><label for="tableau_embed_shortcode_defaults_height"><?php esc_html_e( 'Desktop height', 'tableau-embed-shortcode' ); ?></label></th>
+						<td><input type="number" min="200" class="small-text" id="tableau_embed_shortcode_defaults_height" name="tableau_embed_shortcode_defaults[height]" value="<?php echo esc_attr( $default_options['height'] ); ?>" /> <span class="description"><?php esc_html_e( 'pixels', 'tableau-embed-shortcode' ); ?></span></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="tableau_embed_shortcode_defaults_tablet_height"><?php esc_html_e( 'Tablet height', 'tableau-embed-shortcode' ); ?></label></th>
+						<td><input type="number" min="200" class="small-text" id="tableau_embed_shortcode_defaults_tablet_height" name="tableau_embed_shortcode_defaults[tablet_height]" value="<?php echo esc_attr( $default_options['tablet_height'] ); ?>" /> <span class="description"><?php esc_html_e( 'pixels', 'tableau-embed-shortcode' ); ?></span></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="tableau_embed_shortcode_defaults_mobile_height"><?php esc_html_e( 'Mobile height', 'tableau-embed-shortcode' ); ?></label></th>
+						<td><input type="number" min="200" class="small-text" id="tableau_embed_shortcode_defaults_mobile_height" name="tableau_embed_shortcode_defaults[mobile_height]" value="<?php echo esc_attr( $default_options['mobile_height'] ); ?>" /> <span class="description"><?php esc_html_e( 'pixels', 'tableau-embed-shortcode' ); ?></span></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="tableau_embed_shortcode_defaults_max_width"><?php esc_html_e( 'Maximum width', 'tableau-embed-shortcode' ); ?></label></th>
+						<td><input type="number" min="0" class="small-text" id="tableau_embed_shortcode_defaults_max_width" name="tableau_embed_shortcode_defaults[max_width]" value="<?php echo esc_attr( $default_options['max_width'] ); ?>" /> <span class="description"><?php esc_html_e( 'pixels, leave blank or 0 for full width', 'tableau-embed-shortcode' ); ?></span></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="tableau_embed_shortcode_defaults_loading"><?php esc_html_e( 'Default loading behavior', 'tableau-embed-shortcode' ); ?></label></th>
+						<td>
+							<select id="tableau_embed_shortcode_defaults_loading" name="tableau_embed_shortcode_defaults[loading]">
+								<option value="lazy"<?php selected( $default_options['loading'], 'lazy' ); ?>><?php esc_html_e( 'lazy', 'tableau-embed-shortcode' ); ?></option>
+								<option value="eager"<?php selected( $default_options['loading'], 'eager' ); ?>><?php esc_html_e( 'eager', 'tableau-embed-shortcode' ); ?></option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Show fallback link by default', 'tableau-embed-shortcode' ); ?></th>
+						<td><label><input type="checkbox" name="tableau_embed_shortcode_defaults[show_link]" value="1" <?php checked( $default_options['show_link'], 'true' ); ?> /> <?php esc_html_e( 'Show the visible Tableau Public link unless a shortcode overrides it.', 'tableau-embed-shortcode' ); ?></label></td>
+					</tr>
+				</table>
+				<?php submit_button( __( 'Save Global Defaults', 'tableau-embed-shortcode' ) ); ?>
 			</form>
 
 			<h2><?php esc_html_e( 'Examples', 'tableau-embed-shortcode' ); ?></h2>
