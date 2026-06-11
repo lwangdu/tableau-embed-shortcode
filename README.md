@@ -75,7 +75,7 @@ After setting those once, your shortcode can be much shorter.
   HTML-encoded or URL-encoded slashes are supported, for example
   `WORKBOOK_NAME&#47;DASHBOARD_NAME` and `WORKBOOK_NAME%2FDASHBOARD_NAME`.
 - `public_url`
-  Optional. Full Tableau Public URL for the iframe and fallback link. Must use `https://public.tableau.com/views/`.
+  Optional. Full Tableau Public URL for the iframe and optional extra link. Must use `https://public.tableau.com/views/`.
 - `max_width`
   Optional. Maximum frontend width in pixels. Useful when you want multiple embeds to appear the same width.
 - `height`
@@ -90,8 +90,8 @@ After setting those once, your shortcode can be much shorter.
 - `summary`
   Optional. Short text shown under the title.
 - `show_link`
-  Optional. Set to `false` to hide the visible Tableau Public fallback link.
-  Default is `true`. The fallback link appears below the embedded map or chart.
+  Optional. Set to `true` to show an extra visible Tableau Public link below the embedded map or chart.
+  Default is `false`, because Tableau's own toolbar already includes a "View on Tableau Public" link.
 - `hide_title`
   Optional. Set to `true` to visually hide the title while keeping it available to screen readers.
   When the title is hidden, the fallback link uses generic visible text and keeps the chart title in an accessible label.
@@ -151,14 +151,14 @@ Use **`loading="eager"`** so the iframe is not deferred by the browser’s lazy-
 - Add `summary` for important charts when possible.
 - Prefer `loading="eager"` for prominent charts at the top of the page so visualization is not unnecessarily delayed.
 - Use `tablet_height`, `mobile_height`, and `max_width` to improve consistency across phones, tablets, and desktop.
-- Keep the visible Tableau Public fallback link unless there is a strong reason to hide it.
+- Use `show_link="true"` only when you need an extra visible Tableau Public link outside the embedded toolbar.
 - Use a real Tableau Public embed link in `public_url` if you want an exact iframe and fallback URL.
 - For the most important visualizations, also provide a short text summary or data table on the page.
 
 ## Security notes
 
 - The plugin renders Tableau Public inside a sandboxed iframe instead of loading Tableau JavaScript into the WordPress page.
-- The iframe uses a restricted sandbox policy (`allow-same-origin allow-scripts`) to limit capabilities.
+- The iframe uses a restricted sandbox policy that allows Tableau Public toolbar links and user-initiated navigation while keeping the embed isolated from the WordPress page.
 - The `name` value is sanitized to a Tableau Public workbook/view path.
 - To allow only approved dashboards, use **Settings -> Tableau Embed** and add one allowed `WORKBOOK_NAME/DASHBOARD_NAME` per line.
 - You can also enforce allowed dashboards in code with the `tableau_embed_shortcode_allowed_names` filter.

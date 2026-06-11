@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tableau Embed Shortcode
  * Description: Provides an accessible Tableau embed shortcode for reusable dashboard embeds.
- * Version: 1.0.6
+ * Version: 1.0.7
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: Lobsang Wangdu
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TABLEAU_EMBED_SHORTCODE_VERSION' ) ) {
-	define( 'TABLEAU_EMBED_SHORTCODE_VERSION', '1.0.6' );
+	define( 'TABLEAU_EMBED_SHORTCODE_VERSION', '1.0.7' );
 }
 
 /**
@@ -131,7 +131,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_get_default_options' ) ) {
 			'height'        => '827',
 			'tablet_height' => '640',
 			'mobile_height' => '727',
-			'show_link'     => 'true',
+			'show_link'     => 'false',
 			'loading'       => 'lazy',
 		);
 
@@ -330,13 +330,13 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 		);
 		$fallback_label = sprintf(
 			/* translators: %s: Tableau visualization title. */
-			__( 'Open %s on Tableau Public', 'tableau-embed-shortcode' ),
+			__( 'Open %s on Tableau Public (opens in a new window)', 'tableau-embed-shortcode' ),
 			$title
 		);
 		$fallback_text  = $hide_title ? __( 'Open this chart on Tableau Public', 'tableau-embed-shortcode' ) : $fallback_label;
 		$noscript_label = sprintf(
 			/* translators: %s: Tableau visualization title. */
-			__( 'View %s on Tableau Public', 'tableau-embed-shortcode' ),
+			__( 'View %s on Tableau Public (opens in a new window)', 'tableau-embed-shortcode' ),
 			$title
 		);
 		$noscript_text = $hide_title ? __( 'View this chart on Tableau Public', 'tableau-embed-shortcode' ) : $noscript_label;
@@ -443,7 +443,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 			>
 				<noscript>
 					<p>
-						<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $noscript_label ); ?>">
+						<a href="<?php echo esc_url( $public_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( $noscript_label ); ?>">
 							<?php echo esc_html( $noscript_text ); ?>
 						</a>
 					</p>
@@ -455,7 +455,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 					title="<?php echo esc_attr( $iframe_title ); ?>"
 					loading="<?php echo esc_attr( $iframe_loading ); ?>"
 					referrerpolicy="strict-origin-when-cross-origin"
-					sandbox="allow-same-origin allow-scripts"
+					sandbox="allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
 					allow="fullscreen"
 					allowfullscreen
 					<?php if ( ! empty( $describedby_attr ) ) : ?>
@@ -466,7 +466,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_render' ) ) {
 
 			<?php if ( $show_link ) : ?>
 				<p id="<?php echo esc_attr( $fallback_id ); ?>">
-					<a href="<?php echo esc_url( $public_url ); ?>" aria-label="<?php echo esc_attr( $fallback_label ); ?>">
+					<a href="<?php echo esc_url( $public_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( $fallback_label ); ?>">
 						<?php echo esc_html( $fallback_text ); ?>
 					</a>
 				</p>
@@ -596,7 +596,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 	 * @return void
 	 */
 	function tableau_embed_shortcode_examples_page() {
-		$examples = array(
+		$examples        = array(
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard"]',
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" height="827" mobile_height="727" summary="Interactive Tableau dashboard showing user numbers."]',
 			'[tableau_embed title="User Numbers Dashboard" name="1_Reserveusers/Usernumbersdashboard" hide_title="true" height="827" mobile_height="727"]',
@@ -666,11 +666,11 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 								<option value="eager"<?php selected( $default_options['loading'], 'eager' ); ?>><?php esc_html_e( 'eager', 'tableau-embed-shortcode' ); ?></option>
 							</select>
 						</td>
-					</tr>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Show fallback link by default', 'tableau-embed-shortcode' ); ?></th>
-						<td><label><input type="checkbox" name="tableau_embed_shortcode_defaults[show_link]" value="1" <?php checked( $default_options['show_link'], 'true' ); ?> /> <?php esc_html_e( 'Show the visible Tableau Public link unless a shortcode overrides it.', 'tableau-embed-shortcode' ); ?></label></td>
-					</tr>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Show extra Tableau Public link by default', 'tableau-embed-shortcode' ); ?></th>
+							<td><label><input type="checkbox" name="tableau_embed_shortcode_defaults[show_link]" value="1" <?php checked( $default_options['show_link'], 'true' ); ?> /> <?php esc_html_e( 'Show an extra visible Tableau Public link below the embed unless a shortcode overrides it.', 'tableau-embed-shortcode' ); ?></label></td>
+						</tr>
 				</table>
 				<?php submit_button( __( 'Save Global Defaults', 'tableau-embed-shortcode' ) ); ?>
 			</form>
@@ -691,7 +691,7 @@ if ( ! function_exists( 'tableau_embed_shortcode_examples_page' ) ) {
 				<li><code>mobile_height</code> <?php esc_html_e( 'Optional. Mobile height in pixels. Default: 727.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>heading</code> <?php esc_html_e( 'Optional. Allowed values: h2, h3, h4. Default: h2.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>summary</code> <?php esc_html_e( 'Optional. Short explanatory text shown under the title.', 'tableau-embed-shortcode' ); ?></li>
-				<li><code>show_link</code> <?php esc_html_e( 'Optional. Use false to hide the visible Tableau Public fallback link. Default: true.', 'tableau-embed-shortcode' ); ?></li>
+				<li><code>show_link</code> <?php esc_html_e( 'Optional. Use true to show an extra visible Tableau Public link below the embed. Default: false.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>hide_title</code> <?php esc_html_e( 'Optional. Use true to hide the title visually while keeping it available to screen readers.', 'tableau-embed-shortcode' ); ?></li>
 				<li><code>loading</code> <?php esc_html_e( 'Optional. Iframe lazy loading: lazy (default) or eager for hero or above-the-fold charts.', 'tableau-embed-shortcode' ); ?></li>
 			</ul>
